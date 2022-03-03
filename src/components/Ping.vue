@@ -12,7 +12,7 @@ export default {
   setup(){
     const msg = ref()
     const axios = require('axios');
-    axios.get('http://localhost:5000')
+    axios.get('http://localhost:5000/items')
         .then(function (res) {
             console.log(res)
             msg.value = res.data.msg
