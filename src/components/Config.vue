@@ -40,17 +40,20 @@ export default {
         switch (table.list.data[i].conf_type) {
           case 0:
             table.list.data[i].conf_type = '账本';
+            break;
             // console.log(0)
           case 1:
             table.list.data[i].conf_type = '账户';
+            break;
           case 2:
             table.list.data[i].conf_type = '分类';
+            break;
         };
         
-        if (table.list.data[i].del_flag === true) {
-          table.list.data[i].del_flag = '正常';
-        } else {
+        if (table.list.data[i].del_flag) {
           table.list.data[i].del_flag = '冻结';
+        } else {
+          table.list.data[i].del_flag = '正常';
         };
       };
 
