@@ -12,5 +12,6 @@ export const router = createRouter({
       { path: '/auth/register', name: 'Register', component: () => import('./components/auth/Register')},
       { path: '/items', name: 'Items', component: () => import('./components/main/AccountBook')},
       { path: '/item/:id', name: 'Feature', component: () => import('./components/main/BookFeature')},
+      { path: '/config', name: 'Config', component: () => import('./components/Config') }
     ]
   })

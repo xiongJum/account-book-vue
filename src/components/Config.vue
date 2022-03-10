@@ -5,13 +5,9 @@
     </thead>
     <tbody>
       <tr v-for="tbody in list.data" :key="tbody.id">
-        <td>{{ tbody.happen_time }}</td>
-        <td>{{ tbody.title }}</td>
-        <td>{{ tbody.account }}</td>
-        <td>{{ tbody.amount }}</td>
-        <td>{{ tbody.category }}</td>
-        <td>{{ tbody.label }}</td>
-        <td>{{ tbody.remark }}</td>
+        <td>{{ tbody.heading }}</td>
+        <td>{{ tbody.conf_type }}</td>
+        <td>{{ tbody.del_flag }}</td>
         <td>
           <button
             type="button"
@@ -32,18 +28,36 @@ import { reactive, toRefs } from "vue";
 export default {
   setup() {
     // 表头字段
-    const theads = ["发生日期", "标题", "账户", "金额", "分类", "标签", "备注","操作"]
+    const theads = ["配置名称", "配置类型", "状态", "操作"]
     const table = reactive({
       list: [], // 表格内容
     });
     const axios = require("axios");
-    axios.get("http://localhost:5000/items").then(function (response) {
+    axios.get("http://localhost:5000/configs").then(function (response) {
       // console.log(response)
       table.list = response.data;
+      for (let i in table.list.data) {
+        switch (table.list.data[i].conf_type) {
+          case 0:
+            table.list.data[i].conf_type = '账本';
+            // console.log(0)
+          case 1:
+            table.list.data[i].conf_type = '账户';
+          case 2:
+            table.list.data[i].conf_type = '分类';
+        };
+        
+        if (table.list.data[i].del_flag === true) {
+          table.list.data[i].del_flag = '正常';
+        } else {
+          table.list.data[i].del_flag = '冻结';
+        };
+      };
+
     });
 
     function delBill(event, id) {
-      axios.delete("http://localhost:5000/items/" + id)
+      axios.delete("http://localhost:5000/config/" + id)
         .then(function (response) {
           // console.log(response);
         })

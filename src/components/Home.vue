@@ -1,46 +1,25 @@
 <template>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>
 
-<div>
-  <p>Home page</p>
-  <p>Random number from backend: {{ accountItems }}</p>
-  <button @click="accounts">New random number</button>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
-
-<script>
-import axios from 'axios'
-
-export default {
-  data () {
-    return {
-      accountItems: ''
-    }
-  },
-  methods: {
-    accounts () {
-        this.accountItems = this.getAccountItems()
-    },
-    getAccountItems () {
-        const path = 'http://localhost:5000/items';
-        axios.get(path)
-        .then(res => {
-            this.accountItems = res.data.date
-            console.log(this.accountItems)
-        })
-        .catch(error => {
-            console.log(error)
-        })
-    }
-//     getRandomInt (min, max) {
-//       max = Math.floor(max)
-//       return Math.floor(Math.random() * (max - min + 1)) + min
-//     },
-//     getRandom () {
-//     this.randomNumber = this.getRandomInt(1, 100)
-//     }
-//   },
-//   created () {
-//     this.getRandom()
-  }
-}
-</script>
