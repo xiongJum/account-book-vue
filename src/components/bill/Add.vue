@@ -47,7 +47,6 @@
 <script>
 
 import { reactive, toRefs } from "vue";
-import { router } from '@/router';
 
 export default {
   setup() {
@@ -59,20 +58,22 @@ export default {
         happen_time: Date,
       }
       });
+
     const axios = require("axios");
 
-    axios.get("http://localhost:5000/configs")
-      .then(function (response) {
+    /**
+     * 请求配置接口， 映射配置项
+     */
+    axios.get("http://localhost:5000/configs").then(function (response) {
         let configs = response.data.data
         for (let i in configs) {
-          let id = configs[i].id
-          let heading = configs[i].heading
-          let del_flag = configs[i].del_flag
-          let conf_type = configs[i].conf_type
+          let id = configs[i].id; 
+          let heading = configs[i].heading; 
 
-          if (!del_flag) {
+          // 当del_flag 为 false 时， 不显示在选择框中
+          if (!configs[i].del_flag) {
 
-            switch (conf_type) {
+            switch (configs[i].conf_type) {
               case 0:
                 select.ledger[id] = heading;
                 break;
@@ -83,27 +84,23 @@ export default {
                 select.category[id] = heading;
                 break;
               default:
-                console.log("错误");
+                console.log("请检查服务端是否配置了新类型");
                 break;
             }
 
           }
         }
-        console.log(select.category)
-
       });
 
     // 提交记账
-
     function keeping (){
       axios.post("http://localhost:5000/items", select.param).then( function (response) {
-        console.log(response)
-        location.reload();
-        alert("记账成功")
+        location.reload(); // 刷新页面
+        alert("记账成功") // 弹窗提示，后续优化
       })
     }
 
-
+    // 返回
     return {
       ...toRefs(select),
       keeping
