@@ -47,6 +47,7 @@
 <script>
 
 import { reactive, toRefs } from "vue";
+import { router } from '@/router';
 
 export default {
   setup() {
@@ -59,11 +60,6 @@ export default {
       }
       });
     const axios = require("axios");
-    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-    axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'POST';
-    axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'x-requested-with,content-type';
-
-
 
     axios.get("http://localhost:5000/configs")
       .then(function (response) {
@@ -102,6 +98,8 @@ export default {
     function keeping (){
       axios.post("http://localhost:5000/items", select.param).then( function (response) {
         console.log(response)
+        location.reload();
+        alert("记账成功")
       })
     }
 
