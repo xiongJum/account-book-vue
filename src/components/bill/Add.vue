@@ -33,7 +33,8 @@
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">标签</label>
-    <input type="text" class="form-control" v-model="param.label">
+    <input type="text" class="form-control" v-model="param.label" @keyup.space="label">
+    <p >{{ test }}</p>
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">备注</label>
@@ -77,7 +78,9 @@ export default {
       ledger: {}, //账本
       param: {
         happen_time: new_date(),
-      }
+      },
+      test:[],
+      value: ""
       });
 
     const axios = require("axios");
@@ -85,7 +88,7 @@ export default {
     /**
      * 请求配置接口， 映射配置项
      */
-    axios.get("http://localhost:5000/configs").then(function (response) {
+    axios.get("http://localhost:5000/config").then(function (response) {
         let configs = response.data.data
         for (let i in configs) {
           let id = configs[i].id; 
@@ -115,16 +118,21 @@ export default {
 
     // 提交记账
     function keeping (){
-      axios.post("http://localhost:5000/items", select.param).then( function (response) {
+      axios.post("http://localhost:5000/accountbook", select.param).then( function (response) {
         location.reload(); // 刷新页面
         alert("记账成功") // 弹窗提示，后续优化
       })
     }
 
+    function label() {
+      select.test.push(param.label)
+    }
+
     // 返回
     return {
       ...toRefs(select),
-      keeping
+      keeping,
+      label
     }
 
   },

@@ -68,7 +68,7 @@
             <div class="form-check form-switch">
               <input 
                 class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" 
-                v-model="payload.del_flag" :disabled="new_or_edit_flag" :checked="payload.del_flag">
+                v-model="payload.del_flag"  :checked="payload.del_flag">
               <label class="form-check-label" for="flexSwitchCheckDefault">开启代表冻结此配置项</label>
             </div>
           </dd>
@@ -126,7 +126,7 @@ export default {
     /**
      * 获取数据
      */
-    axios.get("http://localhost:5000/configs").then(function (response) {
+    axios.get("http://localhost:5000/config").then(function (response) {
       // console.log(response)
       table.list = response.data;
     });
@@ -153,16 +153,19 @@ export default {
       if (id) { // 编辑配置项
 
         if (del_flag) {
-          axios.delete("http://localhost:5000/config/" + id).then ( function (response) {
+          axios.delete("http://localhost:5000/config?id=" + id).then ( function (response) {
             location.reload();
           })
+          .catch ( function (error) {
+            alert(error.response.data.msg);
+          })
         }else {
-          axios.put('http://localhost:5000/config/' + id, table.payload).then( function (response) {
+          axios.put('http://localhost:5000/config', table.payload).then( function (response) {
             location.reload(); // 刷新页面
           })
         }
       } else {
-        axios.post("http://localhost:5000/configs", table.payload).then( function (response) {
+        axios.post("http://localhost:5000/config", table.payload).then( function (response) {
           location.reload(); // 刷新页面
         })
       }

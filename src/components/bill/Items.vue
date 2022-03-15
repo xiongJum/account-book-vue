@@ -6,6 +6,7 @@
     <tbody>
       <tr v-for="tbody in list.data" :key="tbody.id">
         <td>{{ tbody.happen_time }}</td>
+        <td>{{ tbody.serial_num }}</td>
         <td>{{ tbody.title }}</td>
         <td>{{ tbody.account }}</td>
         <td>{{ tbody.amount }}</td>
@@ -32,21 +33,21 @@ import { reactive, toRefs } from "vue";
 export default {
   setup() {
     // 表头字段
-    const theads = ["发生日期", "标题", "账户", "金额", "分类", "标签", "备注","操作"]
+    const theads = ["流水号","发生日期", "标题", "账户", "金额", "分类", "标签", "备注","操作"]
     const table = reactive({
       list: [], // 表格内容
     });
 
     // 获取账本数据
     const axios = require("axios");
-    axios.get("http://localhost:5000/items").then(function (response) {
+    axios.get("http://localhost:5000/accountbook").then(function (response) {
       // console.log(response)
       table.list = response.data;
 
       /**
        * 字段映射
        */
-      axios.get("http://localhost:5000/configs").then(function (response) {
+      axios.get("http://localhost:5000/config").then(function (response) {
         var configs = response.data.data
       
         for (let i in configs) {
@@ -63,7 +64,7 @@ export default {
 
     // 单条删除账单明细
     function delBill(event, id) {
-      axios.delete("http://localhost:5000/items/" + id)
+      axios.delete("http://localhost:5000/account?id=" + id)
         .then(function (response) {
           // console.log(response);
         })
