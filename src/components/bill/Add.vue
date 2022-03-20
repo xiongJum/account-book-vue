@@ -21,12 +21,7 @@
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">标题</label>
-        <input
-          type="text"
-          class="form-control"
-          v-model="param.title"
-          required="required"
-        />
+        <input type="text" class="form-control" v-model="param.title" required="required" />
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">账户</label>
@@ -38,30 +33,18 @@
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">金额</label>
-        <input
-          type="number"
-          class="form-control"
-          v-model="param.amount"
-          required="required"
-        />
+        <input type="number" class="form-control" v-model="param.amount" required="required" />
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">分类</label>
-        <select
-          class="form-select"
-          required="required"
-          v-model="param.category"
-        >
+        <select class="form-select" required="required" v-model="param.category">
           <option v-for="(value, key) in category" :key="value" :value="key">
             {{ value }}
           </option>
         </select>
       </div>
       <div class="mb-3">
-        <label
-          for="exampleInputPassword1"
-          class="form-label"
-          style="margin-right: 10px"
+        <label for="exampleInputPassword1" class="form-label" style="margin-right: 10px"
           >标签:</label
         >
         <span
@@ -71,8 +54,7 @@
           :class="snap.colour[index]"
           v-for="(label, index) in param.label"
           :key="label"
-          >{{ label }}
-          <a @click="del_lable(index)" :class="snap.colour[index]">x</a></span
+          >{{ label }} <a @click="del_lable(index)" :class="snap.colour[index]">x</a></span
         >
         <input
           type="tag"
@@ -163,28 +145,17 @@ export default {
 
     // 提交记账
     function keeping() {
-      axios
-        .post("http://localhost:5000/accountbook", select.param)
-        .then(function (response) {
-          location.reload(); // 刷新页面
-          alert("记账成功"); // 弹窗提示，后续优化
-        });
+      axios.post("http://localhost:5000/accountbook", select.param).then(function (response) {
+        location.reload(); // 刷新页面
+        alert("记账成功"); // 弹窗提示，后续优化
+      });
     }
 
     // 显示标签，获取标签的请求参数
     function get_label() {
-      let colour = [
-        "primary",
-        "secondary",
-        "success",
-        "danger",
-        "warning",
-        "info",
-        "dark",
-      ];
+      let colour = ["primary", "secondary", "success", "danger", "warning", "info", "dark"];
       let color_style =
-        "badge rounded-pill bg-" +
-        colour[Math.floor(Math.random() * colour.length)];
+        "badge rounded-pill bg-" + colour[Math.floor(Math.random() * colour.length)];
 
       let label = select.snap.label.replace(/(\s*$)/g, "");
 
@@ -201,17 +172,12 @@ export default {
     }
 
     function del_lable(index) {
+      var my_box = document.getElementById(`${index}`);
 
-      var my_box = document.getElementById(`${index}`)
-      // child_box[0].remove()
-      
       if (my_box) {
         my_box.remove();
-        // my_box.style.display = 'none'
-        select.snap.colour.splice(index, index)
-        select.param.ledger.splice(index, index)
-        // delete select.snap.colour[index];
-        // delete select.param.label[index];
+        select.snap.colour.splice(index, index);
+        select.param.ledger.splice(index, index);
       }
     }
 
@@ -225,7 +191,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 .main {
