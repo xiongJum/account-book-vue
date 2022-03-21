@@ -1,12 +1,21 @@
 <template>
 
-<div class="card" style="width: 30rem;">
-  <div class="card-body" id="echart" :style="{ width: '30rem', height: '400px' }">
-    <!-- <h5 class="card-title">Card title</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <a href="#" class="card-link">Card link</a>
-    <a href="#" class="card-link">Another link</a> -->
+<div class="card" style="width: 50rem;">
+  <!-- Example single danger button -->
+  <div class="btn-group">
+    <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Action
+    </button>
+    <ul class="dropdown-menu" style="float:right">
+      <li><a class="dropdown-item" href="#">Action</a></li>
+      <li><a class="dropdown-item" href="#">Another action</a></li>
+      <li><a class="dropdown-item" href="#">Something else here</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#">Separated link</a></li>
+    </ul>
+  </div>
+
+  <div class="card-body" id="echart" :style="{ width: '50rem', height: '400px' }">
   </div>
 </div>
 
@@ -25,53 +34,9 @@ export default {
     /// 声明定义一下echart
     let echart = echarts;
 
-    // onMounted(() => {
-    //   initChart();
-    //   run();
-    // });
-
-    // onUnmounted(() => {
-    //   echart.dispose;
-    // });
-
     function initChart(option) {
       let chart = echart.init(document.getElementById("echart"), "light");
-      console.log("CC")
       console.log(option)
-      // 把配置和数据放这里
-
-      // var option = {
-      //   title: {
-      //     text: "年度支出表"
-      //   },
-      //   tooltip: {
-      //     trigger: "axis"
-      //   },
-      //   legend: {
-      //     data: ["收入金额"]
-      //   },
-      //   xAxis: {
-      //     type: "category",
-      //     data: x
-      //   },
-      //   yAxis: {
-      //     type: "value"
-      //   },
-      //   series: [
-      //     {
-      //       name: "收入金额",
-      //       data: y,
-      //       type: "bar",
-      //       smooth: true
-      //     },
-      //     {
-      //       name: "支出金额",
-      //       data: ["-123", '-1000'],
-      //       type: "bar"
-      //     }
-      //   ]
-      // }
-
       chart.setOption(option)
       
       window.onresize = function() {
@@ -101,24 +66,48 @@ export default {
     const show_field = reactive({
       option: {
         title: { text: "年度支出表" },
-        tooltip: { trigger: "axis" },
+        tooltip: {},
+        // 设置图例样式
         legend: { data: ["收入", "支出"] },
+        // 设置x 轴坐标样式
         xAxis: {
           type: "category",
           data: []
         },
+        // y 轴坐标样式
         yAxis: { type: "value" },
+        
+        // 配置柱图
         series: [
           {
             name: "收入",
             data: [],
             type: "bar",
-            smooth: true
+            smooth: true,
+            // 柱图样式
+            itemStyle:{
+              color: "#89B0AE",
+              /**
+               * 描边样式
+               */
+              borderWidth: "2", // 宽度
+              borderColor: "#D4ECE8", // 颜色
+              borderType: "solid", // 样式
+              // barCategoryGap: "1%", // 柱间距离
+              barBorderRadius: 5, // 圆角半径
+            },
+            barWidth: "20%", // 宽度
+            barGap: "-100%", // 不同系列的柱间距离，-100时重叠，且只对 bar 生效
           },
           {
             name: "支出",
             data: [],
-            type: "bar"
+            type: "bar",
+            itemStyle:{
+              color: "#e03616",
+              barBorderRadius: 8, // 圆角半径
+            },
+            barWidth: "20%",
           }
         ]
         
@@ -129,7 +118,7 @@ export default {
         response_field.data = res.data
       
         for (var i=0; i<response_field.data.data.length; i++) {
-          // show_field.option.xAxis.data[i] = response_field.data.data[i]['date'];
+          show_field.option.xAxis.data[i] = response_field.data.data[i]['date'];
           show_field.option.series[sub].data[i] = response_field.data.data[i]['amount']
         };
         
@@ -146,7 +135,6 @@ export default {
     
     return { 
       ...toRefs(response_field),
-
       ...toRefs(request_fleld),
       ...toRefs(show_field),
       // run
