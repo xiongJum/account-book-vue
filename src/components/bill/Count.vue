@@ -2,6 +2,13 @@
 
 <div class="card" style="width: 50rem; position: relative">
 
+<div class="btn-group" role="group" aria-label="Basic mixed styles example" 
+      style="width: 10rem; left: 304px; position: absolute; top:16px; z-index:3">
+  <span type='button' class="badge rounded-pill bg-primary" @click="changeDate(new_date.year - 1, 'month')">{{new_date.year - 1}}</span>
+  <span type='button' class="badge rounded-pill bg-secondary" @click="changeDate(new_date.year, 'month')">{{new_date.year}}</span>
+  <span type='button' class="badge rounded-pill bg-success" @click="changeDate(new_date.month, 'day')">{{new_date.month}} mon</span>
+</div>
+
 <!-- Example single danger button -->
 <div class="btn-group" style="width: 10rem; right: -32px; position: absolute; top:16px; z-index:3">
   <span type="button" class="badge rounded-pill bg-danger" data-bs-toggle="dropdown" aria-expanded="false">
@@ -10,8 +17,6 @@
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" @click="changeStyle('line')">曲线</a></li>
     <li><a class="dropdown-item" @click="changeStyle('bar')">柱状图</a></li>
-    <li><a class="dropdown-item" @click="years()">今年</a></li>
-    <li><a class="dropdown-item" href="#">Something else here</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="#">Separated link</a></li>
   </ul>
@@ -26,9 +31,9 @@
 
 <script>
 import * as echarts from 'echarts'
-import { onMounted, onUnmounted, reactive, toRefs } from '@vue/runtime-core';
+import { onMounted, reactive, toRefs } from '@vue/runtime-core';
 import axios from 'axios';
-import { getNowFormatDateList } from '../../js/GetDateList'
+import { getNowFormatDateList, getNowFormatDate } from '../../js/GetDateList'
 
 export default {
   name: "echartsBox",
@@ -37,69 +42,55 @@ export default {
     /// 声明定义一下echart
     let echart = echarts;
 
+    onMounted(() => { // 挂载函数，当实例挂载完成后被调用
+      run ()
+    })
+
     function initChart(option) {
-      let chart = echart.init(document.getElementById("echart"), "light");
-      console.log(option)
+      let chart = echart.getInstanceByDom(document.getElementById("echart")); // 如果存在，则获取 DOM 节点
+      if (chart == null) { // 如果不存在就初始化
+        chart = echart.init(document.getElementById("echart"), "light");
+      }
+      chart.showLoading() // 启用加载动画
       chart.setOption(option)
-      
+      chart.hideLoading() // 关闭加载动画
       window.onresize = function() {
         //自适应大小
         chart.resize();
       };
+    } 
+
+    // 执行， 获取数据并生成图表
+    function run () {
+      console.log("SS")
+      request_fleld.param.profit_or_loss = 'profit'
+      public_request(request_fleld.param, 0)
+      request_fleld.param.profit_or_loss = 'loss'
+      public_request(request_fleld.param, 1, true)
+      // initChart(show_field.option)
     }
-
-    function getNowFormatDate (step_size='month') { // 获取当月
-      var date = new Date ();
-      if (step_size === 'month') {
-        var month = date.getMonth() + 1
-        var month_tmp = month > 9 ? month : "0" + month;
-        var dayDict = {
-          31: ["1", "3", "5", "7", "8", "10", "12"],
-          30: ["4", "6", "9", "11"]
-        }
-        var yearMonth = date.getFullYear() + '-' + month_tmp + '-'
-        var interval_date = {start_day: yearMonth + '01'}
-        if (month in dayDict[31]) {
-          interval_date['end_day'] = yearMonth + '31'
-          return interval_date
-        } else if (month in dayDict[30]) {
-          interval_date['end_day'] = yearMonth + '30'
-          return interval_date
-        } else if (month === '2') {
-          if (date.getFullYear() % 4 ===0 && date.getFullYear() % 100 === 0) {
-            interval_date['end_day'] = yearMonth + '29'
-          } else {
-            interval_date['end_day'] = yearMonth + '28'
-
-          }
-        }
-      } else {
-        return {start_day: date.getFullYear() + '-01-01', end_day: date.getFullYear() + '12-31'}
-      }
-    }
-
-    const new_date = getNowFormatDate () 
 
     let url = "http://localhost:5000/count/date"
 
+    var new_date = new Date ()
+
     const request_fleld = reactive({
       param: {
-        // end_day: new_date['end_day'],
-        // start_day: new_date['start_day'],
-        end_day: '2022-03-31',
-        start_day: '2022-03-01',
+        end_day: getNowFormatDate('last'),
+        start_day: getNowFormatDate(),
         step_size: "day",
         profit_or_loss: "profit"
       },
     });
 
     const response_field = reactive({
-      data:{},
-      tmp: {
-        
-      },
-      date: [],
-      amount: []
+      tmp: {},
+      new_date: {
+        date: new_date,
+        year: new_date.getFullYear(),
+        month: new_date.getMonth() + 1,
+        day: new_date.getDate()
+      }
     })
 
     const show_field = reactive({
@@ -107,7 +98,13 @@ export default {
         title: { text: "年度支出表" },
         tooltip: {},
         // 设置图例样式
-        legend: { data: ["收入", "支出"] },
+        legend: { 
+          data: ["收入", "支出"],
+          orient: 'vertical',
+          // right: 10,
+          top: 'bottom',
+          left: 'left'
+          },
         // 设置x 轴坐标样式
         xAxis: {
           type: "category",
@@ -167,27 +164,23 @@ export default {
           }
         }
 
+        // 遍历日期列表，设置 x 和 y 轴 的值
         for (let i=0; i<response_field.date.length; i++) {
-          show_field.option.xAxis.data[i] = response_field.date[i] // 生成 x 轴坐标，时间
-          if (response_field.tmp[response_field.date[i]]) { // 如果不行
+          show_field.option.xAxis.data[i] = response_field.date[i]
+          if (response_field.tmp[response_field.date[i]]) {
             show_field.option.series[sub].data[i] = response_field.tmp[response_field.date[i]]
           } else {
             show_field.option.series[sub].data[i] = 0
           }
         }
-
-        response_field.tmp = {} // 清空临时字典
+        // 清空临时字典， 防止下一次使用时混用数据
+        response_field.tmp = {} 
         
         if (is_run === true) {
           initChart(show_field.option)
         }
       });
     }
-    
-    request_fleld.param.profit_or_loss = 'profit'
-    public_request(request_fleld.param, 0)
-    request_fleld.param.profit_or_loss = 'loss'
-    public_request(request_fleld.param, 1, true)
 
     function changeStyle (style) {
 
@@ -196,22 +189,27 @@ export default {
       initChart(show_field.option)
     }
 
-    function years() {
+    function changeDate(date, date_type) {
+      /**
+       * 改变 echarts 的显示数据， 并重新调用
+       */
       // 清空上一个视图的数据
       show_field.option.xAxis.data = [];
       show_field.option.series[0].data = [];
       show_field.option.series[1].data = [];
 
-      // 修改条件
-      request_fleld.param.step_size = 'month'
-      request_fleld.param.start_day = '2022-01-01'
-      request_fleld.param.end_day = '2022-12-31'
+      // 改变数据
+      if (date_type === 'month') {
+        request_fleld.param.step_size = 'month'
+        request_fleld.param.start_day = `${date}-01-01`
+        request_fleld.param.end_day = `${date}-12-31` 
+      } else {
+        request_fleld.param.step_size = 'day';
+        request_fleld.param.end_day = getNowFormatDate('last');
+        request_fleld.param.start_day = getNowFormatDate();
+      }
 
-      // 发起请求
-      request_fleld.param.profit_or_loss = 'profit'
-      public_request(request_fleld.param, 0)
-      request_fleld.param.profit_or_loss = 'loss'
-      public_request(request_fleld.param, 1, true)
+      run ()
     }
     
     return { 
@@ -219,8 +217,8 @@ export default {
       ...toRefs(request_fleld),
       ...toRefs(show_field),
       changeStyle,
-      years
-      // run
+      changeDate,
+      run
       };
   }
 };

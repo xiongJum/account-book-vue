@@ -2,45 +2,56 @@
 var newDate = new Date ()
 
 
+export function getNowFormatDate(first_or_last='first', now_format_date=false) {
+
+  /**
+   * 获取当前月份的开始时间和结束时间
+   */
+  
+  var year, month, day
+  if (now_format_date === false) {
+    year = newDate.getFullYear();
+    month = newDate.getMonth() + 1;
+  } else {
+    now_format_date = getDate(now_format_date);
+    year = now_format_date.getFullYear()
+    month = now_format_date.getMonth() + 1
+  }
+  
+  switch (first_or_last) {
+    case 'first':
+      day = new Date (year, month - 1, 1);// 这个月份的第一天
+      day = DateToFormat(day);
+      break;
+
+    case 'last' :
+      day = new Date (year, month, 1) // 这个月份的最后一天
+      day = DateToFormat(day)
+      break;
+    
+    default:
+      throw 'first_or_last 请传入 first 或 last。'
+  }
+
+  return day
+}
+
+function DateToFormat (date) { //将时间转换为字符串, 本地时间
+
+  date = date.toLocaleDateString()
+  date = date.split('/')
+  var month = date[1] > 9 ? date[1] : "0" + date[1];
+  var day = date[2] > 9 ? date[2] : "0" + date[2];
+  return `${date[0]}-${month}-${day}`
+}
+
+
 function getDate(datestr) { // 将字符串转换为当前时间
     var temp = datestr.split("-");
     var date = new Date(temp[0], temp[1]-1, temp[2]);
     // console.log(date);
     return date
   }
-
-function getNowFormatDate (step_size='month') { // 获取当月
-    
-    if (step_size === 'month') {
-      var month = newDate.getMonth() + 1
-      var month_tmp = month > 9 ? month : "0" + month;
-      var dayDict = {
-        31: ["1", "3", "5", "7", "8", "10", "12"],
-        30: ["4", "6", "9", "11"]
-      }
-      var year = newDate.getFullYear()
-      var yearMonth = year + '-' + month_tmp + '-'
-      var interval_date = {start_day: yearMonth + '01'}
-     
-      if (month in dayDict[31]) {
-        interval_date['end_day'] = yearMonth + '31'
-        return interval_date
-      } else if (month in dayDict[30]) {
-        interval_date['end_day'] = yearMonth + '30'
-        return interval_date
-      } else if (month === '2') {
-        
-        if (year % 4 ===0 && year % 100 === 0) {
-          interval_date['end_day'] = yearMonth + '29'
-        } else {
-          interval_date['end_day'] = yearMonth + '28'
-        }
-      }
-    } else {
-      return {start_day: date.getFullYear() + '-01-01', end_day: date.getFullYear() + '12-31'}
-    }
-  }
-
 
 export function getNowFormatDateList (start_day, end_day, time_span='day') {
 
@@ -69,7 +80,6 @@ export function getNowFormatDateList (start_day, end_day, time_span='day') {
             /**
              *  显示单年份的全部月份 
              */ 
-            console.log(3333333333)
             let year = startTime.getFullYear();
             for (let i=1; i<13; i++) {
                 let month = i > 9 ? i : "0" + i;
