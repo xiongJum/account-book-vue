@@ -21,7 +21,7 @@ headers = {
 for i in range(31):
     time.sleep(0.5)
     param["happen_time"] = f'2022-03-{i}'
-    param["amount"] = random.randint(30, 100)
+    param["amount"] = random.randint(-50, 50)
 
     res = requests.post(url=url, headers=headers, json=param)
     print(i, res.status_code)

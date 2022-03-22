@@ -77,8 +77,9 @@ export default {
     function delBill(event, id) {
 
       let param = {id: id}
+      console.log(param)
       axios
-        .delete(url.accountbook, param)
+        .delete(url.accountbook+ `?id=${id}`)
         .then(function (response) {
           // console.log(response);
         })

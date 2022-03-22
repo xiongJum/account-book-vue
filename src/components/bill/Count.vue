@@ -10,7 +10,7 @@
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" @click="changeStyle('line')">曲线</a></li>
     <li><a class="dropdown-item" @click="changeStyle('bar')">柱状图</a></li>
-    <li><a class="dropdown-item" @click="years(2020)">今年</a></li>
+    <li><a class="dropdown-item" @click="years()">今年</a></li>
     <li><a class="dropdown-item" href="#">Something else here</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="#">Separated link</a></li>
@@ -28,6 +28,7 @@
 import * as echarts from 'echarts'
 import { onMounted, onUnmounted, reactive, toRefs } from '@vue/runtime-core';
 import axios from 'axios';
+import { getNowFormatDateList } from '../../js/GetDateList'
 
 export default {
   name: "echartsBox",
@@ -83,8 +84,10 @@ export default {
 
     const request_fleld = reactive({
       param: {
-        end_day: new_date['end_day'],
-        start_day: new_date['start_day'],
+        // end_day: new_date['end_day'],
+        // start_day: new_date['start_day'],
+        end_day: '2022-03-31',
+        start_day: '2022-03-01',
         step_size: "day",
         profit_or_loss: "profit"
       },
@@ -126,13 +129,13 @@ export default {
               /**
                * 描边样式
                */
-              borderWidth: "2", // 宽度
+              // borderWidth: "2", // 宽度
               borderColor: "#D4ECE8", // 颜色
               borderType: "solid", // 样式
               // barCategoryGap: "1%", // 柱间距离
-              barBorderRadius: 5, // 圆角半径
+              borderRadius: 5, // 圆角半径
             },
-            // barWidth: "10%", // 宽度
+            barWidth: "20%", // 宽度
             barGap: "-100%", // 不同系列的柱间距离，-100时重叠，且只对 bar 生效
           },
           {
@@ -141,7 +144,7 @@ export default {
             type: "bar",
             itemStyle:{
               color: "#e03616",
-              barBorderRadius: 8, // 圆角半径
+              borderRadius: 8, // 圆角半径
             },
             barWidth: "20%",
           }
@@ -149,29 +152,12 @@ export default {
         
       }
     })
-
-    function getDate(datestr) { // 将字符串转换为当前时间
-      var temp = datestr.split("-");
-      var date = new Date(temp[0], temp[1]-1, temp[2]);
-      console.log(date);
-      return date
-    }
-
-    function getDateList () { // 获取时间列表
-      let i = 0;
-      var startTime = getDate(request_fleld.param.start_day)
-      var endTime = getDate(request_fleld.param.end_day)
-      while((endTime.getTime()-startTime.getTime())>=0){
-            var year = startTime.getFullYear();
-            var month = (startTime.getMonth()+1).toString().length==1?"0"+(startTime.getMonth()+1).toString():(startTime.getMonth()+1).toString();
-            var day = startTime.getDate().toString().length==1?"0"+startTime.getDate():startTime.getDate();
-            response_field.date[i]=year+"-"+month+"-"+day;
-            startTime.setDate(startTime.getDate()+1);
-            i+=1;
-      }
-    }
     
     const public_request = function(payload, sub, is_run=false) {
+
+      // 生成查询日期列表
+      response_field.date = getNowFormatDateList (request_fleld.param.start_day, request_fleld.param.end_day, request_fleld.param.step_size)
+      
       axios.post(url, payload).then (function (res) {
 
         if (res.data) { 
@@ -181,8 +167,6 @@ export default {
           }
         }
 
-        getDateList() // 生成查询日期列表
-
         for (let i=0; i<response_field.date.length; i++) {
           show_field.option.xAxis.data[i] = response_field.date[i] // 生成 x 轴坐标，时间
           if (response_field.tmp[response_field.date[i]]) { // 如果不行
@@ -191,6 +175,7 @@ export default {
             show_field.option.series[sub].data[i] = 0
           }
         }
+
         response_field.tmp = {} // 清空临时字典
         
         if (is_run === true) {
@@ -210,12 +195,31 @@ export default {
       show_field.option.series[1]['type'] = style
       initChart(show_field.option)
     }
+
+    function years() {
+      // 清空上一个视图的数据
+      show_field.option.xAxis.data = [];
+      show_field.option.series[0].data = [];
+      show_field.option.series[1].data = [];
+
+      // 修改条件
+      request_fleld.param.step_size = 'month'
+      request_fleld.param.start_day = '2022-01-01'
+      request_fleld.param.end_day = '2022-12-31'
+
+      // 发起请求
+      request_fleld.param.profit_or_loss = 'profit'
+      public_request(request_fleld.param, 0)
+      request_fleld.param.profit_or_loss = 'loss'
+      public_request(request_fleld.param, 1, true)
+    }
     
     return { 
       ...toRefs(response_field),
       ...toRefs(request_fleld),
       ...toRefs(show_field),
-      changeStyle
+      changeStyle,
+      years
       // run
       };
   }
