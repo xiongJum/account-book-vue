@@ -31,45 +31,18 @@
 
 <script>
 
-import * as echarts from 'echarts'
 import { onMounted, reactive, toRefs } from '@vue/runtime-core';
 import axios from 'axios';
+import { MyEcharts } from '../../js/MyEcharts'
 import { getNowFormatDateList, getNowFormatDate } from '../../js/GetDateList'
 
 export default {
   name: "income-statement",
   setup() {
 
-    /// 声明定义一下echart
-    let echart = echarts;
-
     onMounted(() => { // 挂载函数，当实例挂载完成后被调用
       run ()
     })
-
-    function initChart(option) {
-      let chart = echart.getInstanceByDom(document.getElementById("echart")); // 如果存在，则获取 DOM 节点
-      if (chart == null) { // 如果不存在就初始化
-        chart = echart.init(document.getElementById("echart"), "light");
-      }
-      chart.showLoading() // 启用加载动画
-      chart.setOption(option)
-      chart.hideLoading() // 关闭加载动画
-      window.onresize = function() {
-        //自适应大小
-        chart.resize();
-      };
-    } 
-
-    // 执行， 获取数据并生成图表
-    function run () {
-      console.log("SS")
-      request_fleld.param.profit_or_loss = 'profit'
-      public_request(request_fleld.param, 0)
-      request_fleld.param.profit_or_loss = 'loss'
-      public_request(request_fleld.param, 1, true)
-      // initChart(show_field.option)
-    }
 
     let url = "http://localhost:5000/count/date"
 
@@ -150,6 +123,17 @@ export default {
         
       }
     })
+
+    let Is = new MyEcharts (show_field.option, 'echart')
+
+    // 执行， 获取数据并生成图表
+    function run () {
+      request_fleld.param.profit_or_loss = 'profit'
+      public_request(request_fleld.param, 0)
+      request_fleld.param.profit_or_loss = 'loss'
+      public_request(request_fleld.param, 1, true)
+      // initChart(show_field.option)
+    }
     
     const public_request = function(payload, sub, is_run=false) {
 
@@ -178,7 +162,8 @@ export default {
         response_field.tmp = {} 
         
         if (is_run === true) {
-          initChart(show_field.option)
+          // initChart(show_field.option, 'echart')
+          Is.initChart()
         }
       });
     }
@@ -187,7 +172,8 @@ export default {
 
       show_field.option.series[0]['type'] = style
       show_field.option.series[1]['type'] = style
-      initChart(show_field.option)
+      // initChart(show_field.option, 'echart')
+      Is.initChart()
     }
 
     function changeDate(date, date_type) {

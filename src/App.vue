@@ -1,4 +1,5 @@
 <template>
+
 <nav class="navbar navbar-light bg-light">
   <form class="container-fluid justify-content-start">
     <button class="btn btn-sm btn-outline-success me-3" type="button" @click="jump($event, 'start')">开始记账</button>
@@ -20,8 +21,11 @@ export default {
   name: "App",
   components: {
     HelloWorld,
+
   },
+
   setup () {
+
     // 跳转页面
     function jump ($event, link_name) {
       switch (link_name) {
@@ -37,7 +41,7 @@ export default {
       }
     }
     return {
-      jump
+      jump,
     }
   }
 };
