@@ -31,6 +31,8 @@
 
 <script>
 
+// 损益表
+
 import { onMounted, reactive, toRefs } from '@vue/runtime-core';
 import axios from 'axios';
 import { MyEcharts } from '../../js/MyEcharts'

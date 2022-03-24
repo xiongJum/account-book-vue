@@ -5,7 +5,7 @@
 </div>
   <div class="container">
     <div class="row">
-      <div class="col">col</div>
+      <div class="col"><StatementOfCashFlows></StatementOfCashFlows></div>
       <div class="col">col</div>
       <div class="col">col</div>
       <div class="col">col</div>
@@ -21,12 +21,15 @@
 import { ref } from '@vue/runtime-core';
 import IncomeStatement from "../mychart/IncomeStatement.vue";
 import Assets from "../mychart/Assets.vue";
+import StatementOfCashFlows from '../mychart/StatementOfCashFlows.vue'
+
 
 export default {
   components: {
     // 挂载组件
     Assets,
     IncomeStatement,
+    StatementOfCashFlows
   },
   setup() {
 
